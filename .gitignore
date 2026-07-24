@@ -1,0 +1,8 @@
+# KHONG day file server-side chua SECRET_TOKEN len GitHub cong khai
+google-apps-script.gs
+*.gs
+# File lam viec noi bo
+*.zip
+landingpage-cod/
+*-content-*.md
+.DS_Store
