@@ -64,7 +64,8 @@ fbq('track', 'PageView');
   --max:1140px;
 }
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
-html{scroll-behavior:smooth}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+html,body{overflow-x:hidden;max-width:100%}
 body{font-family:var(--font-body);background:var(--canvas);color:var(--text-1);line-height:1.6;font-size:16.5px;-webkit-font-smoothing:antialiased}
 img{max-width:100%;display:block}
 a{color:inherit}
@@ -242,8 +243,8 @@ section{padding:4.5rem 0}
 .spec-lab{font-size:.86rem;color:var(--text-2);font-weight:600}
 
 /* ---------- Compare table ---------- */
-.cmp{background:var(--surface);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-2)}
-.cmp table{width:100%;border-collapse:collapse}
+.cmp{background:var(--surface);border-radius:var(--radius-lg);overflow-x:auto;-webkit-overflow-scrolling:touch;box-shadow:var(--shadow-2)}
+.cmp table{width:100%;border-collapse:collapse;min-width:440px}
 .cmp th,.cmp td{padding:1rem 1.15rem;text-align:left;font-size:.98rem}
 .cmp thead th{background:var(--text-1);color:#f1f0ed;font-family:var(--font-display);font-weight:400;font-size:1.02rem;letter-spacing:.03em;text-transform:uppercase}
 .cmp tbody tr:nth-child(even){background:var(--canvas)}
@@ -388,34 +389,61 @@ footer{background:var(--text-1);padding:2.75rem 0 6.5rem;text-align:center}
 }
 @media(max-width:768px){
   section{padding:3.25rem 0}
+  .hero{padding:1.5rem 0 2.5rem}
   .btn-header-cta{display:none}
-  .trust-row{grid-template-columns:repeat(2,1fr);gap:1rem}
-  .spec-strip{grid-template-columns:repeat(2,1fr)}
+  .header-container{padding:.75rem 1.1rem}
+  .trust-row{grid-template-columns:repeat(2,1fr);gap:1rem .75rem}
+  .trust-item{justify-content:flex-start;font-size:.88rem}
+  .spec-strip{grid-template-columns:repeat(2,1fr);padding:1.35rem;gap:1.25rem 1rem}
   .tst-grid{grid-template-columns:1fr}
   .card-number{width:38px;height:38px;font-size:.95rem}
   .cmp th,.cmp td{padding:.8rem .75rem;font-size:.9rem}
   .footer-links{flex-direction:column;gap:.5rem}
+  .footer-contact{flex-direction:column;gap:.6rem}
   .form-container{padding:1.9rem 1.25rem}
+  .sec-head{margin-bottom:2rem}
+  .story p.lead{font-size:1.18rem}
+  .btn{min-height:48px}
 }
 @media(max-width:480px){
   body{font-size:16px}
   .wrap{padding:0 1.1rem}
-  .pain-grid,.feat-grid,.combo-grid{grid-template-columns:1fr}
+  .pain-grid,.feat-grid,.combo-grid,.guar-grid{grid-template-columns:1fr}
   .form-row{grid-template-columns:1fr}
   .hero-cta{flex-direction:column}
   .hero-cta .btn{width:100%}
-  .sticky-bar{padding:.65rem .9rem}
-  .sticky-bar .btn{width:100%;padding:.9rem 1rem;font-size:.95rem}
-  .gal-thumb{flex:0 0 58px;width:58px;height:58px}
-  .gal-nav{width:36px;height:36px}
-  .gal-nav .icon{width:19px;height:19px}
-  .pd-benefits{grid-template-columns:1fr;gap:.7rem;padding:1.1rem 0 1.3rem}
-  .pd-opt{padding:1rem .9rem .8rem}
-  .pd-opt-name{font-size:.96rem}
-  .pd-now{font-size:1.22rem}
-  .pd-item img{width:32px;height:32px}
-  .pd-item-name,.pd-item-price{font-size:.71rem}
+  .pd-actions .btn{width:100%}
+  .sticky-bar{padding:.6rem .9rem calc(.6rem + env(safe-area-inset-bottom))}
+  .sticky-bar .btn{width:100%;padding:.95rem 1rem;font-size:1rem}
+  .gal-thumb{flex:0 0 54px;width:54px;height:54px}
+  .gal-nav{width:34px;height:34px}
+  .gal-nav .icon{width:18px;height:18px}
+  .gal-count{font-size:.72rem;padding:.25rem .55rem}
+  .hero-media{padding:.6rem}
+  .rating-row{gap:.4rem .55rem;font-size:.86rem;padding-bottom:1.1rem}
+  .rating-row .sep{display:none}
+  .pd-benefits{grid-template-columns:1fr;gap:.6rem;padding:1rem 0 1.2rem}
+  .pd-opt{padding:1rem .85rem .8rem}
+  .pd-opt-top{gap:.6rem}
+  .pd-opt-name{font-size:.95rem}
+  .pd-opt-sub{font-size:.82rem}
+  .pd-now{font-size:1.2rem}
+  .pd-tag{font-size:.64rem;padding:.28rem .6rem;top:-10px}
+  .pd-items{padding:.7rem .45rem;gap:.25rem}
+  .pd-item img{width:30px;height:30px}
+  .pd-item-name,.pd-item-price{font-size:.68rem}
+  .pd-plus{width:16px;height:16px}
+  .pd-plus .icon{width:11px;height:11px}
+  .pd-gift{font-size:.8rem;padding:.55rem .65rem}
   .pd-quote{padding:1.2rem 1.1rem 1rem}
+  .pd-quote p{font-size:.95rem}
+  .spec-val{font-size:1.6rem}
+  .spec-lab{font-size:.8rem}
+  .combo-card{padding:2rem 1.3rem 1.5rem}
+  .color-chip{min-width:0;padding:.8rem .4rem;font-size:.9rem}
+  .final-cta-container,.final-cta{padding-left:0;padding-right:0}
+  .faq-question{font-size:.96rem;padding:1.1rem 1.1rem}
+  h2{font-size:clamp(1.55rem,6.5vw,2rem)}
 }
 </style>
 </head>
