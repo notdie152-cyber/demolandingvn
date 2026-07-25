@@ -1379,6 +1379,7 @@ function tryCloudflare(){
     .then(function(r){return r.text();})
     .then(function(t){var m=t.match(/ip=([^\n]+)/);if(m&&m[1])return m[1].trim();return Promise.reject('no ip');});
 }
+// ipify IPv4-only (api.ipify.org) -> uu tien IPv4 cho de doc + match
 function tryIpify(){
   return fetch('https://api.ipify.org?format=json',{cache:'no-store'})
     .then(function(r){return r.json();})
@@ -1389,8 +1390,9 @@ function tryIpinfo(){
     .then(function(r){return r.json();})
     .then(function(d){if(d&&d.ip)return d.ip;return Promise.reject('no ip');});
 }
-tryCloudflare()
-  .catch(function(){return tryIpify();})
+// Uu tien IPv4 (ipify) -> Cloudflare (co the IPv6) -> ipinfo du phong
+tryIpify()
+  .catch(function(){return tryCloudflare();})
   .catch(function(){return tryIpinfo();})
   .then(function(ip){userIP=ip;})
   .catch(function(){})
