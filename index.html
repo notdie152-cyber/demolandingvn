@@ -298,6 +298,15 @@ section{padding:4.5rem 0}
 .form-group input:focus,.form-group select:focus,.form-group textarea:focus{outline:none;border-color:var(--accent);background:var(--surface)}
 .form-group input.error,.form-group select.error,.form-group textarea.error{border-color:#c0392b}
 .form-error{display:none;color:#c0392b;font-size:.84rem;margin-top:.35rem;font-weight:600}
+.label-hint{font-weight:500;color:var(--text-3);font-size:.82rem}
+.color-options{display:flex;gap:.6rem;flex-wrap:wrap}
+.color-chip{position:relative;flex:1;min-width:90px;display:flex;align-items:center;justify-content:center;gap:.4rem;padding:.8rem .6rem;border-radius:var(--radius-md);background:var(--canvas);border:1.5px solid #ddd8d0;cursor:pointer;font-weight:700;font-size:.95rem;color:var(--text-1);transition:border-color .2s,background .2s}
+.color-chip input{position:absolute;opacity:0;width:0;height:0}
+.color-chip span{display:inline-flex;align-items:center;gap:.45rem}
+.color-chip span::before{content:"";width:18px;height:18px;border-radius:50%;border:2px solid #c9c2b6;transition:all .2s}
+.color-chip:has(input:checked){border-color:var(--accent);background:var(--surface-warm)}
+.color-chip:has(input:checked) span::before{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 3px var(--surface-warm)}
+.form-group.has-error .color-options .color-chip{border-color:#c0392b}
 .form-group.has-error .form-error{display:block}
 .form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .hp-field{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
@@ -900,44 +909,57 @@ footer{background:var(--text-1);padding:2.75rem 0 6.5rem;text-align:center}
             <div class="form-error" role="alert" aria-live="polite">Vui lòng nhập địa chỉ nhận hàng</div>
           </div>
 
-          <div class="form-group">
-            <label for="province">Tỉnh/Thành phố *</label>
-            <select id="province" name="province" required>
-              <option value="">-- Chọn tỉnh/thành --</option>
-              <option value="Ha Noi">Hà Nội</option>
-              <option value="TP Ho Chi Minh">TP. Hồ Chí Minh</option>
-              <option value="Da Nang">Đà Nẵng</option>
-              <option value="Hai Phong">Hải Phòng</option>
-              <option value="Can Tho">Cần Thơ</option>
-              <option value="Binh Duong">Bình Dương</option>
-              <option value="Dong Nai">Đồng Nai</option>
-              <option value="Khanh Hoa">Khánh Hòa</option>
-              <option value="Nghe An">Nghệ An</option>
-              <option value="Thanh Hoa">Thanh Hóa</option>
-              <option value="Tinh thanh khac">Tỉnh/thành khác</option>
-            </select>
-            <div class="form-error" role="alert" aria-live="polite">Vui lòng chọn tỉnh/thành</div>
+          <!-- Địa chỉ hành chính: Tỉnh -> Quận/Huyện -> Phường/Xã (JS đổ dữ liệu từ API) -->
+          <div id="locationSelects">
+            <div class="form-group">
+              <label for="province">Tỉnh/Thành phố *</label>
+              <select id="province" name="province" required>
+                <option value="">-- Chọn tỉnh/thành --</option>
+              </select>
+              <div class="form-error" role="alert" aria-live="polite">Vui lòng chọn tỉnh/thành</div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="district">Quận/Huyện *</label>
+                <select id="district" name="district" required disabled>
+                  <option value="">-- Chọn quận/huyện --</option>
+                </select>
+                <div class="form-error" role="alert" aria-live="polite">Vui lòng chọn quận/huyện</div>
+              </div>
+              <div class="form-group">
+                <label for="ward">Phường/Xã *</label>
+                <select id="ward" name="ward" required disabled>
+                  <option value="">-- Chọn phường/xã --</option>
+                </select>
+                <div class="form-error" role="alert" aria-live="polite">Vui lòng chọn phường/xã</div>
+              </div>
+            </div>
           </div>
 
-          <div class="form-row">
-            <div class="form-group">
-              <label for="color">Màu sắc *</label>
-              <select id="color" name="color" required>
-                <option value="">-- Chọn màu --</option>
-                <option value="Hong">Hồng</option>
-                <option value="Xanh duong">Xanh dương</option>
-                <option value="Den">Đen</option>
-              </select>
-              <div class="form-error" role="alert" aria-live="polite">Vui lòng chọn màu</div>
+          <!-- Fallback khi API địa giới không tải được: nhập tay 1 ô -->
+          <div class="form-group" id="locationFallback" style="display:none">
+            <label for="location_text">Tỉnh / Quận huyện / Phường xã *</label>
+            <input type="text" id="location_text" name="location_text" placeholder="VD: Phường Bến Thành, Quận 1, TP. Hồ Chí Minh">
+            <div class="form-error" role="alert" aria-live="polite">Vui lòng nhập tỉnh/quận/xã</div>
+          </div>
+
+          <div class="form-group">
+            <label>Màu sắc * <span class="label-hint">(chọn 1 hoặc nhiều màu)</span></label>
+            <div class="color-options" id="colorOptions">
+              <label class="color-chip"><input type="checkbox" name="color" value="Hồng"><span>Hồng</span></label>
+              <label class="color-chip"><input type="checkbox" name="color" value="Xanh dương"><span>Xanh dương</span></label>
+              <label class="color-chip"><input type="checkbox" name="color" value="Đen"><span>Đen</span></label>
             </div>
-            <div class="form-group">
-              <label for="combo">Combo *</label>
-              <!-- Các option được JS sinh tự động từ PRICING config -->
-              <select id="combo" name="combo" required>
-                <option value="">-- Chọn combo --</option>
-              </select>
-              <div class="form-error" role="alert" aria-live="polite">Vui lòng chọn combo</div>
-            </div>
+            <div class="form-error" role="alert" aria-live="polite">Vui lòng chọn ít nhất một màu</div>
+          </div>
+
+          <div class="form-group">
+            <label for="combo">Combo *</label>
+            <!-- Các option được JS sinh tự động từ PRICING config -->
+            <select id="combo" name="combo" required>
+              <option value="">-- Chọn combo --</option>
+            </select>
+            <div class="form-error" role="alert" aria-live="polite">Vui lòng chọn combo</div>
           </div>
 
           <div class="form-group">
@@ -1459,6 +1481,98 @@ regForm.querySelectorAll('[required]').forEach(function(input){
 });
 
 /* ============================================================
+   7b. Địa giới hành chính Tỉnh -> Quận/Huyện -> Phường/Xã
+   Đổ dữ liệu từ API công khai provinces.open-api.vn.
+   Nếu API không tải được -> chuyển sang ô nhập tay (không chặn đơn).
+   ============================================================ */
+(function(){
+  var API='https://provinces.open-api.vn/api';
+  var provinceSel=document.getElementById('province');
+  var districtSel=document.getElementById('district');
+  var wardSel=document.getElementById('ward');
+  var selectsBox=document.getElementById('locationSelects');
+  var fallbackBox=document.getElementById('locationFallback');
+  var locationText=document.getElementById('location_text');
+
+  function fill(sel,items,placeholder){
+    sel.innerHTML='<option value="">'+placeholder+'</option>';
+    items.forEach(function(it){
+      var o=document.createElement('option');
+      o.value=it.name; o.setAttribute('data-code',it.code);
+      o.textContent=it.name;
+      sel.appendChild(o);
+    });
+  }
+  function reset(sel,placeholder){ sel.innerHTML='<option value="">'+placeholder+'</option>'; sel.disabled=true; }
+
+  // Chuyển sang nhập tay khi API lỗi
+  function enableFallback(){
+    [provinceSel,districtSel,wardSel].forEach(function(s){ s.removeAttribute('required'); });
+    selectsBox.style.display='none';
+    fallbackBox.style.display='block';
+    locationText.setAttribute('required','');
+    locationText.addEventListener('blur',function(){validateField(this);});
+    locationText.addEventListener('input',function(){if(this.classList.contains('error'))validateField(this);});
+  }
+
+  // Nạp danh sách tỉnh
+  fetch(API+'/p/')
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .then(function(list){
+      if(!Array.isArray(list)||!list.length) throw 0;
+      fill(provinceSel,list,'-- Chọn tỉnh/thành --');
+    })
+    .catch(function(){ enableFallback(); });
+
+  provinceSel.addEventListener('change',function(){
+    reset(districtSel,'-- Chọn quận/huyện --');
+    reset(wardSel,'-- Chọn phường/xã --');
+    var code=this.selectedOptions[0]&&this.selectedOptions[0].getAttribute('data-code');
+    if(!code) return;
+    fetch(API+'/p/'+code+'?depth=2')
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(d){
+        fill(districtSel,(d.districts||[]),'-- Chọn quận/huyện --');
+        districtSel.disabled=false;
+      })
+      .catch(function(){ enableFallback(); });
+  });
+
+  districtSel.addEventListener('change',function(){
+    reset(wardSel,'-- Chọn phường/xã --');
+    var code=this.selectedOptions[0]&&this.selectedOptions[0].getAttribute('data-code');
+    if(!code) return;
+    fetch(API+'/d/'+code+'?depth=2')
+      .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+      .then(function(d){
+        fill(wardSel,(d.wards||[]),'-- Chọn phường/xã --');
+        wardSel.disabled=false;
+      })
+      .catch(function(){ enableFallback(); });
+  });
+})();
+
+/* ============================================================
+   7c. Màu sắc - checkbox chọn nhiều (ít nhất 1)
+   ============================================================ */
+function locationFallbackOn(){
+  var fb=document.getElementById('locationFallback');
+  return fb && fb.style.display!=='none';
+}
+function validateColors(){
+  var wrap=document.getElementById('colorOptions');
+  var group=wrap.closest('.form-group');
+  var ok=wrap.querySelectorAll('input:checked').length>0;
+  group.classList.toggle('has-error',!ok);
+  return ok;
+}
+document.querySelectorAll('#colorOptions input').forEach(function(cb){
+  cb.addEventListener('change',function(){
+    if(document.getElementById('colorOptions').closest('.form-group').classList.contains('has-error')) validateColors();
+  });
+});
+
+/* ============================================================
    8. Submit handler - event 'lead'
    KHÔNG gọi CAPI ở đây - Pixel browser-side fire sau khi lưu thành công.
    ============================================================ */
@@ -1479,6 +1593,7 @@ regForm.addEventListener('submit',function(e){
 
   var allValid=true;
   regForm.querySelectorAll('[required]').forEach(function(i){ if(!validateField(i)) allValid=false; });
+  if(!validateColors()) allValid=false;
   if(!allValid){
     var firstErr=regForm.querySelector('.has-error');
     if(firstErr) firstErr.scrollIntoView({behavior:'smooth',block:'center'});
@@ -1501,8 +1616,11 @@ regForm.addEventListener('submit',function(e){
     fullname: document.getElementById('fullname').value.trim(),
     phone:    document.getElementById('phone').value.trim(),
     address:  document.getElementById('address').value.trim(),
-    province: document.getElementById('province').value,
-    color:    document.getElementById('color').value,
+    province: locationFallbackOn() ? '' : document.getElementById('province').value,
+    district: locationFallbackOn() ? '' : document.getElementById('district').value,
+    ward:     locationFallbackOn() ? '' : document.getElementById('ward').value,
+    location_text: locationFallbackOn() ? document.getElementById('location_text').value.trim() : '',
+    color:    Array.prototype.map.call(document.querySelectorAll('#colorOptions input:checked'),function(c){return c.value;}).join(', '),
     combo:    document.getElementById('combo').value,
     note:     document.getElementById('note').value.trim(),
     code:     regCode,
